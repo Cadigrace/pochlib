@@ -3,8 +3,6 @@ function createAddButton() {
   var addButton = $('<button id="addButton" type="button">Ajouter un nouveau livre</button>');
   $('.h2').after(addButton);
 
-  // TODO : to remove
-  showSearchForm();
   addButton.click(function() {
     showSearchForm();
   })
@@ -27,14 +25,6 @@ function showSearchForm() {
   ')
   $('.h2').after(form);
 
-  // TODO : to remove
-  searchBooks();
-  $('#searchButton').click(function() {
-    searchBooks();
-  })
-}
-
-function showResults(data) {
   var searchBlock = $(' \
     <hr> \
     <div id="section-result" class="grid-container"> \
@@ -43,6 +33,15 @@ function showResults(data) {
     </div> \
   ')
   $('#cancelButton').after(searchBlock);
+
+  $('#searchButton').click(function() {
+    searchBooks();
+  })
+}
+
+function showResults(data) {
+
+  $('#results').empty();
 
   if (data.totalItems == 0) {
     $(`<p>Aucun livre n’a été trouvé</p>`).appendTo('#results');
@@ -64,7 +63,7 @@ function showResults(data) {
     }
     var book = $(` \
       <div class="grid-item">\
-        <img src="" /> \
+        <img src="./img/bookmark.png" id="bookmark-${item.id}" class="action-icon" /> \
         <h3 class="book-title">Titre : ${item.volumeInfo.title}</h3> \
         <h3 class="book-id">Id : ${item.id}</h3> \
         <h4 class="book-author">Auteur : ${author}</h4> \
@@ -74,23 +73,127 @@ function showResults(data) {
         </div>
       </div>\
     `).appendTo('#results')
+
+    $(`#bookmark-${item.id}`).click(function() {
+      addBookToPochList(item)
+    });
+
   });
+}
+
+function showPochList() {
+  var pochList = sessionStorage.getItem("pochList");
+
+  $('#pochlist').empty();
+  if (!pochList) {
+    $(`<p>Aucun livre dans votre pochList</p>`).appendTo('#pochlist');
+    return;
+  }
+
+  pochList = JSON.parse(pochList);
+
+  pochList.forEach(item => {
+    var author = 'Information manquante'
+    if (item.volumeInfo.authors && item.volumeInfo.authors.length > 0) {
+      author = item.volumeInfo.authors[0]
+    }
+    var desc = 'Information manquante'
+    if (item.volumeInfo.description) {
+      desc = item.volumeInfo.description
+    }
+    var img = './img/unavailable.png'
+    if (item.volumeInfo.imageLinks.thumbnail) {
+      img = item.volumeInfo.imageLinks.thumbnail
+    }
+    var book = $(` \
+      <div class="grid-item">\
+        <img src="./img/trash.png" id="trash-${item.id}" class="action-icon" /> \
+        <h3 class="book-title">Titre : ${item.volumeInfo.title}</h3> \
+        <h3 class="book-id">Id : ${item.id}</h3> \
+        <h4 class="book-author">Auteur : ${author}</h4> \
+        <p class="book-desc">Description : ${desc}</p> \
+        <div class="book-img"> \
+          <img src="${img}" /> \
+        </div>
+      </div>\
+    `).appendTo('#pochlist')
+
+    $(`#trash-${item.id}`).click(function() {
+      deleteFromPochList(item)
+    });
+
+  });
+}
+
+function deleteFromPochList(book) {
+  var pochList = sessionStorage.getItem("pochList");
+  if(!pochList) {
+    return false;
+  }
+  pochList = JSON.parse(pochList);
+
+  pochList = pochList.filter(function(item) {
+    return item.id != book.id;
+  })
+  sessionStorage.setItem("pochList", JSON.stringify(pochList));
+  showPochList();
+}
+
+function isExist(id) {
+  var pochList = sessionStorage.getItem("pochList");
+  if(!pochList) {
+    return false;
+  }
+  pochList = JSON.parse(pochList);
+  var found = false;
+  pochList.forEach(book => {
+    if(book.id == id) {
+      found = true;
+    }
+  });
+  return found;
+}
+
+function addBookToPochList(book) {
+  if (isExist(book.id)) {
+    alert('Vous ne pouvez ajouter deux fois le même livre');
+    return;
+  }
+
+  var pochList = sessionStorage.getItem("pochList");
+  if(!pochList) {
+    pochList = [];
+  } else {
+    pochList = JSON.parse(pochList);
+  }
+  pochList.push(book);
+  sessionStorage.setItem('pochList', JSON.stringify(pochList));
+  showPochList();
 }
 
 function searchBooks() {
   var title = $('#title').val();
   var author = $('#author').val();
 
-  // TODO : to remove
-  title = 'javascript'
   $.get( `https://www.googleapis.com/books/v1/volumes?q=intitle:${title}+inauthor:${author}`, function( data ) {
     showResults(data);
   });
 }
 
+function initPage() {
+  var pochBlock = $(' \
+    <div id="section-poch" class="grid-container"> \
+      <div id="pochlist" class="result-block" ></div> \
+    </div> \
+  ');
+  pochBlock.appendTo('#content');
+}
+
 $(function() {
 
+  initPage();
   // Creer le bouton Ajout
   createAddButton();
+  showPochList();
 
 });
