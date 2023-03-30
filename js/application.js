@@ -1,33 +1,27 @@
 
 function createAddButton() {
-  var addButton = $('<button id="addButton" type="button">Ajouter un nouveau livre</button>');
+  var addButton = $('<button class="btn-add" id="addButton" type="button">Ajouter un nouveau livre</button>');
   $('.h2').after(addButton);
 
-  addButton.click(function() {
-    showSearchForm();
-  })
-}
-
-function showSearchForm() {
-  $('#addButton').hide();
-
   var form = $('\
-    <div> \
-      <label for="title">Titre du livre</label> \
-      <input type="text" name="title" id="title"> \
+    <div class="form hide"> \
+      <div class="form-input"> \
+        <label for="title">Titre du livre</label> \
+        <input type="text" name="title" id="title"> \
+      </div> \
+      <div class="form-input"> \
+        <label for="author">Auteur</label> \
+        <input type="text" name="author" id="author"> \
+      </div> \
+      <button class="btn-search" id="searchButton" type="button">Rechercher</button> \
+      <button class="btn-cancel" id="cancelButton" type="button">Annuler</button> \
     </div> \
-    <div> \
-      <label for="author">Auteur</label> \
-      <input type="text" name="author" id="author"> \
-    </div> \
-    <button id="searchButton" type="button">Rechercher</button> \
-    <button id="cancelButton" type="button">Annuler</button> \
   ')
   $('.h2').after(form);
 
   var searchBlock = $(' \
-    <hr> \
-    <div id="section-result" class="grid-container"> \
+    <div id="section-result" class="grid-container hide"> \
+      <hr> \
       <h2>Resultats de la recherche</h2> \
       <div id="results" class="result-block" ></div> \
     </div> \
@@ -37,6 +31,20 @@ function showSearchForm() {
   $('#searchButton').click(function() {
     searchBooks();
   })
+
+  $('#cancelButton').click(function() {
+    cancelSearch();
+  })
+
+  addButton.click(function() {
+    showSearchForm();
+  })
+}
+
+function showSearchForm() {
+  $('#addButton').hide();
+  $('.form-input > input').val('');
+  $('.form').show();
 }
 
 function showResults(data) {
@@ -77,7 +85,7 @@ function showResults(data) {
     $(`#bookmark-${item.id}`).click(function() {
       addBookToPochList(item)
     });
-
+    $('#section-result').show();
   });
 }
 
@@ -178,6 +186,12 @@ function searchBooks() {
   $.get( `https://www.googleapis.com/books/v1/volumes?q=intitle:${title}+inauthor:${author}`, function( data ) {
     showResults(data);
   });
+}
+
+function cancelSearch() {
+  $('#addButton').show();
+  $('#section-result').hide();
+  $('.form').hide();
 }
 
 function initPage() {
