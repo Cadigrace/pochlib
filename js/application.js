@@ -53,6 +53,7 @@ function showResults(data) {
 
   if (data.totalItems == 0) {
     $(`<p>Aucun livre n’a été trouvé</p>`).appendTo('#results');
+    $('#section-result').show();
     return;
   }
 
@@ -182,6 +183,10 @@ function addBookToPochList(book) {
 function searchBooks() {
   var title = $('#title').val();
   var author = $('#author').val();
+  if (title === "" || author ===""){
+    alert("Veuillez saisir l'auteur et le titre du livre");
+    return;
+  }  
 
   $.get( `https://www.googleapis.com/books/v1/volumes?q=intitle:${title}+inauthor:${author}`, function( data ) {
     showResults(data);
