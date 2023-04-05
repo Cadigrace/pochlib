@@ -67,7 +67,7 @@ function showResults(data) {
       desc = item.volumeInfo.description
     }
     var img = './img/unavailable.png'
-    if (item.volumeInfo.imageLinks.thumbnail) {
+    if (item.volumeInfo.imageLinks && item.volumeInfo.imageLinks.thumbnail) {
       img = item.volumeInfo.imageLinks.thumbnail
     }
     var book = $(` \
@@ -123,7 +123,7 @@ function showPochList() {
         <p class="book-desc">Description : ${desc}</p> \
         <div class="book-img"> \
           <img src="${img}" /> \
-        </div>
+        </div>\
       </div>\
     `).appendTo('#pochlist')
 

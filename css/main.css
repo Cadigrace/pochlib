@@ -109,6 +109,10 @@ input:focus {
   background-color: #4c0101;
 }
 
+.book-img img {
+  width: 150px;
+}
+
 .grid-container {
   width: 100%;
   padding-right: 15px;
