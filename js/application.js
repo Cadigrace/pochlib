@@ -1,10 +1,10 @@
 
 function createAddButton() {
-  var addButton = $('<button class="btn-add" id="addButton" type="button">Ajouter un nouveau livre</button>');
+  const addButton = $('<button class="btn-add" id="addButton" type="button">Ajouter un nouveau livre</button>');
   $('.h2').after(addButton);
 
-  var form = $('\
-    <div class="form hide"> \
+  const form = $('\
+    <form class="form hide"> \
       <div class="form-input"> \
         <label for="title">Titre du livre</label> \
         <input type="text" name="title" id="title"> \
@@ -15,16 +15,16 @@ function createAddButton() {
       </div> \
       <button class="btn-search" id="searchButton" type="button">Rechercher</button> \
       <button class="btn-cancel" id="cancelButton" type="button">Annuler</button> \
-    </div> \
+    </form> \
   ')
   $('.h2').after(form);
 
-  var searchBlock = $(' \
-    <div id="section-result" class="grid-container hide"> \
+  const searchBlock = $(' \
+    <section id="section-result" class="grid-container hide"> \
       <hr> \
       <h2>Resultats de la recherche</h2> \
       <div id="results" class="result-block" ></div> \
-    </div> \
+    </section> \
   ')
   $('#cancelButton').after(searchBlock);
 
@@ -58,27 +58,27 @@ function showResults(data) {
   }
 
   data.items.forEach(item => {
-    var author = 'Information manquante'
+    let author = 'Information manquante'
     if (item.volumeInfo.authors && item.volumeInfo.authors.length > 0) {
       author = item.volumeInfo.authors[0]
     }
-    var desc = 'Information manquante'
+    let desc = 'Information manquante'
     if (item.volumeInfo.description) {
       desc = item.volumeInfo.description
     }
-    var img = './img/unavailable.png'
+    let img = './img/unavailable.png'
     if (item.volumeInfo.imageLinks && item.volumeInfo.imageLinks.thumbnail) {
       img = item.volumeInfo.imageLinks.thumbnail
     }
-    var book = $(` \
+    const book = $(` \
       <div class="grid-item">\
-        <img src="./img/bookmark.png" id="bookmark-${item.id}" class="action-icon" /> \
+        <img src="./img/bookmark.png" alt="bookmark icone" id="bookmark-${item.id}" class="action-icon" /> \
         <h3 class="book-title">Titre : ${item.volumeInfo.title}</h3> \
         <h3 class="book-id">Id : ${item.id}</h3> \
         <h4 class="book-author">Auteur : ${author}</h4> \
         <p class="book-desc">Description : ${desc}</p> \
         <div class="book-img"> \
-          <img src="${img}" /> \
+          <img alt="image livre" src="${img}" /> \
         </div>
       </div>\
     `).appendTo('#results')
@@ -91,38 +91,38 @@ function showResults(data) {
 }
 
 function showPochList() {
-  var pochList = sessionStorage.getItem("pochList");
+  let pochList = sessionStorage.getItem("pochList");
 
   $('#pochlist').empty();
   if (!pochList) {
-    $(`<p>Aucun livre dans votre pochList</p>`).appendTo('#pochlist');
+    $('#section-poch > .section-title').show();
     return;
   }
 
   pochList = JSON.parse(pochList);
 
   pochList.forEach(item => {
-    var author = 'Information manquante'
+    let author = 'Information manquante'
     if (item.volumeInfo.authors && item.volumeInfo.authors.length > 0) {
       author = item.volumeInfo.authors[0]
     }
-    var desc = 'Information manquante'
+    let desc = 'Information manquante'
     if (item.volumeInfo.description) {
       desc = item.volumeInfo.description
     }
-    var img = './img/unavailable.png'
-    if (item.volumeInfo.imageLinks.thumbnail) {
+    let img = './img/unavailable.png'
+    if (item.volumeInfo.imageLinks && item.volumeInfo.imageLinks.thumbnail) {
       img = item.volumeInfo.imageLinks.thumbnail
     }
-    var book = $(` \
+    const book = $(` \
       <div class="grid-item">\
-        <img src="./img/trash.png" id="trash-${item.id}" class="action-icon" /> \
+        <img alt="icone corbeille" src="./img/trash.png" id="trash-${item.id}" class="action-icon" /> \
         <h3 class="book-title">Titre : ${item.volumeInfo.title}</h3> \
         <h3 class="book-id">Id : ${item.id}</h3> \
         <h4 class="book-author">Auteur : ${author}</h4> \
         <p class="book-desc">Description : ${desc}</p> \
         <div class="book-img"> \
-          <img src="${img}" /> \
+          <img alt="image livre" src="${img}" /> \
         </div>\
       </div>\
     `).appendTo('#pochlist')
@@ -132,10 +132,11 @@ function showPochList() {
     });
 
   });
+  $('#section-poch > .section-title').hide();
 }
 
 function deleteFromPochList(book) {
-  var pochList = sessionStorage.getItem("pochList");
+  let pochList = sessionStorage.getItem("pochList");
   if(!pochList) {
     return false;
   }
@@ -149,12 +150,12 @@ function deleteFromPochList(book) {
 }
 
 function isExist(id) {
-  var pochList = sessionStorage.getItem("pochList");
+  let pochList = sessionStorage.getItem("pochList");
   if(!pochList) {
     return false;
   }
   pochList = JSON.parse(pochList);
-  var found = false;
+  let found = false;
   pochList.forEach(book => {
     if(book.id == id) {
       found = true;
@@ -169,7 +170,7 @@ function addBookToPochList(book) {
     return;
   }
 
-  var pochList = sessionStorage.getItem("pochList");
+  let pochList = sessionStorage.getItem("pochList");
   if(!pochList) {
     pochList = [];
   } else {
@@ -181,8 +182,8 @@ function addBookToPochList(book) {
 }
 
 function searchBooks() {
-  var title = $('#title').val();
-  var author = $('#author').val();
+  const title = $('#title').val();
+  const author = $('#author').val();
   if (title === "" || author ===""){
     alert("Veuillez saisir l'auteur et le titre du livre");
     return;
@@ -200,10 +201,11 @@ function cancelSearch() {
 }
 
 function initPage() {
-  var pochBlock = $(' \
-    <div id="section-poch" class="grid-container"> \
+  const pochBlock = $(' \
+    <section id="section-poch" class="grid-container"> \
+    <p class="section-title hide">Aucun livre dans votre pochList</p> \
       <div id="pochlist" class="result-block" ></div> \
-    </div> \
+    </section> \
   ');
   pochBlock.appendTo('#content');
 }
